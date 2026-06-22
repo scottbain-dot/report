@@ -137,17 +137,18 @@ const BIPA_VAL={Advanced:4,Proficient:3,Intermediate:2,Beginning:1,'No evidence'
 function bipaWord(v){return v>=3.5?'AL':v>=2.5?'PL':v>=1.5?'IL':v>0?'BL':'';}
 function hasBipa(){return ORDER.some(k=>DATA[k].rows.some(r=>Array.isArray(r.bipa)&&r.bipa.length));}
 function bipaRoll(st){const cats={Knowledge:[],Skills:[],'Concept Transfer':[]},atl=[];const dated=st.rows.filter(r=>Array.isArray(r.bipa)&&r.bipa.length).slice().sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));dated.forEach((r,i)=>{const w=i+1;r.bipa.forEach(b=>{if(b.cat==='ATL'){atl.push({label:b.label,band:b.band,date:r.date||''});return;}if(!(b.band in BIPA_VAL))return;if(cats[b.cat])cats[b.cat].push([BIPA_VAL[b.band],w]);});});const lvl=arr=>{if(!arr.length)return '';const ws=arr.reduce((s,[,w])=>s+w,0);const v=arr.reduce((s,[x,w])=>s+x*w,0)/(ws||1);return bipaWord(v);};const K=lvl(cats.Knowledge),S=lvl(cats.Skills),C=lvl(cats['Concept Transfer']);const present=[K,S,C].filter(Boolean).map(x=>BIPA_VAL[x]);const overall=present.length?bipaWord(present.reduce((a,b)=>a+b,0)/present.length):'';return {K,S,C,overall,atl};}
-const SYSTEM_BIPA=`You write end-of-semester Middle School PE report comments for a Frankfurt International School teacher, addressed to parents. These are BIPA standards-based reports: Knowledge, Skills and Concept Transfer levels are reported separately as dropdowns, so the COMMENT focuses on the student's Approaches to Learning (ATL) with only a brief, specific nod to achievement.
+const SYSTEM_BIPA=`You write end-of-semester Middle School PE report comments for a Frankfurt International School teacher, addressed to parents. These are BIPA standards-based reports: Knowledge, Skills and Concept Transfer levels are reported separately as dropdowns, so the COMMENT focuses on the student's Approaches to Learning (ATL) with only a light, specific nod to achievement.
 
-VOICE: warm, personal, specific. Ground every point in the actual evidence — name the real units or things the student did. Generic praise ("performed well across units") is banned; be concrete enough that the comment could only be about this student.
+VOICE: plain, direct, warm. Short punchy sentences, the way a coach writes — like "Fantastic growth this year." / "His self-management really stands out." / "The next step is his analysis." NOT literary or formal. BANNED: dash-clauses that tack on extra detail ("real tactical maturity — directing serves..."), and filler scaffolding like "A meaningful next step for the year ahead will be to", "Across Grade 8 PE as a whole", "open up new levels of achievement". Cut every word that isn't earning its place.
 
 HARD RULES:
-- Third person, addressed to parents. Refer to the student ONLY as the literal token [NAME]. Use the given pronouns.
-- Exactly one point per sentence. Never splice two ideas with dashes, "and", "but" or "because". About 3–4 sentences — short, but specific.
-- Open with ONE brief, concrete achievement from the strongest evidence (a named unit or what they actually did).
-- Then focus on ATL: name an ATL strength (self-management, collaboration, communication, etc., per the ATL evidence) and ONE ATL area to develop, framed as a concrete next step, drawn from the weakest ATL signal.
+- Third person, to parents. Refer to the student ONLY as the token [NAME]. Use the given pronouns.
+- Exactly one point per sentence. Never splice two ideas with dashes, "and", "but" or "because". About 4 sentences — short.
+- OPEN ON THE STUDENT, not a unit. The first sentence is ONE clean standalone read of the student or their year (e.g. "[NAME] has had a strong year in PE."). Do NOT open with a unit name. Do NOT use a "strong year + skill" formula that glues a skill onto the opener.
+- UNITS ARE CONTEXT ONLY. Mention a unit at most once, lightly, as evidence woven into a point — never as the subject of a sentence, never recited, never the opener. It is fine to mention no unit at all.
+- Then: name the ATL strength (its own sentence), then ONE ATL growth step as a concrete next step (its own sentence), then a short forward-looking close.
 - Do NOT state grades, levels, BL/IL/PL/AL, scores or numbers.
-- Use ONLY the evidence and note provided. Never invent events, reasons or feelings. Never frame a missing or "No evidence" item as a failing — turn an ATL gap into a growth step, not a deficit.
+- Use ONLY the evidence, tags and note provided. Never invent events, reasons or feelings. Never frame a missing or "No evidence" item as a failing — turn an ATL gap into a growth step.
 - If a Personal note is provided, weave its specific individual content in naturally — that is the human touch.
 
 Respond with ONLY a JSON object, no markdown, begin with { and end with }: {"comment":"..."}`;
